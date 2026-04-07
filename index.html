@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Instagram Fake Detector</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: url("back.avif") no-repeat center center/cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Dark overlay */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            top: 0;
+            left: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            width: 350px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            color: white;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: purple;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #e08300;
+        }
+
+        #result {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Instagram Account Checker</h2>
+
+    <input type="number" id="posts" placeholder="Posts">
+    <input type="number" id="followers" placeholder="Followers">
+    <input type="number" id="follows" placeholder="Following">
+
+    <button onclick="checkAccount()">Check</button>
+
+    <div id="result"></div>
+</div>
+
+<script>
+async function checkAccount() {
+
+    const posts = document.getElementById("posts").value;
+    const followers = document.getElementById("followers").value;
+    const follows = document.getElementById("follows").value;
+
+    // Validation
+    if (posts === "" || followers === "" || follows === "") {
+        document.getElementById("result").innerHTML =
+            "<span style='color:yellow'>Please fill all fields</span>";
+        return;
+    }
+
+    // Show loading
+    document.getElementById("result").innerHTML =
+        "<span style='color:white'>Loading...</span>";
+
+    try {
+        const response = await fetch("http://127.0.0.1:8000/check", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                posts: parseInt(posts),
+                followers: parseInt(followers),
+                follows: parseInt(follows)
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.result === "Real Account") {
+            document.getElementById("result").innerHTML =
+                "<span style='color:white'>Real Account</span>";
+        } else {
+            document.getElementById("result").innerHTML =
+                "<span style='color:white'>Fake Account</span>";
+        }
+
+    } catch (error) {
+        document.getElementById("result").innerHTML =
+            "<span style='color:white'>Server not running</span>";
+    }
+}
+</script>
+
+</body>
+</html>
